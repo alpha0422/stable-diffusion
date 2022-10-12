@@ -253,6 +253,7 @@ class ResBlock(TimestepBlock):
 
 
     def _forward(self, x, emb):
+      with th.autocast("cuda", dtype=x.dtype):
         if self.updown:
             in_rest, in_conv = self.in_layers[:-1], self.in_layers[-1]
             h = in_rest(x)

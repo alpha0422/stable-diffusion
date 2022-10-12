@@ -658,6 +658,19 @@ if __name__ == "__main__":
 
         trainer_kwargs["callbacks"] = [instantiate_from_config(callbacks_cfg[k]) for k in callbacks_cfg]
 
+        # precision
+        trainer_precision = int(opt.precision[-2:]) if opt.precision != "bf16" \
+            else "bf16"  # 32, 16, bf16
+        if "32" in opt.precision:
+            is_tf32 = (opt.precision == "tf32")
+            torch.backends.cuda.matmul.allow_tf32 = is_tf32
+            torch.backends.cudnn.allow_tf32 = is_tf32
+        if opt.precision == "fp32":
+            os.environ["TORCH_ALLOW_TF32_CUBLAS_OVERRIDE"] = "0"
+        if "16" in opt.precision:
+            trainer_kwargs["amp_backend"] = "native"
+        trainer_kwargs["precision"] = trainer_precision
+
         trainer = Trainer.from_argparse_args(trainer_opt, **trainer_kwargs)
         trainer.logdir = logdir  ###
 
