@@ -295,7 +295,7 @@ class ImageLogger(Callback):
         self.batch_freq = batch_frequency
         self.max_images = max_images
         self.logger_log_images = {
-            pl.loggers.TestTubeLogger: self._testtube,
+            pl.loggers.CSVLogger: self._testtube,
         }
         self.log_steps = [2 ** n for n in range(int(np.log2(self.batch_freq)) + 1)]
         if not increase_log_steps:
@@ -380,11 +380,11 @@ class ImageLogger(Callback):
             return True
         return False
 
-    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx):
+    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         if not self.disabled and (pl_module.global_step > 0 or self.log_first_step):
             self.log_img(pl_module, batch, batch_idx, split="train")
 
-    def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx, dataloader_idx):
+    def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         if not self.disabled and pl_module.global_step > 0:
             self.log_img(pl_module, batch, batch_idx, split="val")
         if hasattr(pl_module, 'calibrate_grad_norm'):
@@ -549,7 +549,7 @@ if __name__ == "__main__":
                 }
             },
             "testtube": {
-                "target": "pytorch_lightning.loggers.TestTubeLogger",
+                "target": "pytorch_lightning.loggers.CSVLogger",
                 "params": {
                     "name": "testtube",
                     "save_dir": logdir,
