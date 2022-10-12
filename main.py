@@ -249,6 +249,7 @@ class SetupCallback(Callback):
         self.lightning_config = lightning_config
 
     def on_keyboard_interrupt(self, trainer, pl_module):
+        return
         if trainer.global_rank == 0:
             print("Summoning checkpoint.")
             ckpt_path = os.path.join(self.ckptdir, "last.ckpt")
@@ -695,6 +696,7 @@ if __name__ == "__main__":
 
         # allow checkpointing via USR1
         def melk(*args, **kwargs):
+            return
             # run all checkpoint hooks
             if trainer.global_rank == 0:
                 print("Summoning checkpoint.")
