@@ -7,6 +7,7 @@ RUN apt-get update && \
     rm /var/lib/apt/lists/* -rf
 
 COPY requirements.txt /workspace/stable-diffusion/requirements.txt
+RUN pip install --ignore-installed PyYAML
 RUN pip install -r /workspace/stable-diffusion/requirements.txt
 
 COPY . /workspace/stable-diffusion

@@ -533,6 +533,9 @@ if __name__ == "__main__":
         trainer_opt = argparse.Namespace(**trainer_config)
         lightning_config.trainer = trainer_config
 
+        # UNetModel contains manual type conversion
+        config.model.params.unet_config.params.use_fp16 = ("16" in opt.precision)
+
         # model
         model = instantiate_from_config(config.model)
 
