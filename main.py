@@ -120,6 +120,12 @@ def get_parser(**parser_kwargs):
         default=True,
         help="scale base-lr by ngpu * batch_size * n_accumulate",
     )
+    parser.add_argument(
+        "--train_batch_size",
+        type=int,
+        default=None,
+        help="Batch size for training",
+    )
     return parser
 
 
@@ -532,6 +538,9 @@ if __name__ == "__main__":
             trainer_config["accelerator"] = "gpu"
         trainer_opt = argparse.Namespace(**trainer_config)
         lightning_config.trainer = trainer_config
+
+        if opt.train_batch_size:
+            config.data.params.batch_size = opt.train_batch_size
 
         # UNetModel contains manual type conversion
         config.model.params.unet_config.params.use_fp16 = ("16" in opt.precision)
