@@ -17,6 +17,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint, Callback, LearningRateM
 from pytorch_lightning.utilities.distributed import rank_zero_only
 from pytorch_lightning.utilities import rank_zero_info
 
+import ldm.modules.diffusionmodules.util
 from ldm.data.base import Txt2ImgIterableBaseDataset
 from ldm.util import instantiate_from_config
 
@@ -125,6 +126,11 @@ def get_parser(**parser_kwargs):
         type=int,
         default=None,
         help="Batch size for training",
+    )
+    parser.add_argument(
+        "--grad_chkpt",
+        action="store_true",
+        help="Enable gradient checkpointing",
     )
     return parser
 
@@ -539,8 +545,10 @@ if __name__ == "__main__":
         trainer_opt = argparse.Namespace(**trainer_config)
         lightning_config.trainer = trainer_config
 
+        # adjust config according to commandline arguments
         if opt.train_batch_size:
             config.data.params.batch_size = opt.train_batch_size
+        ldm.modules.diffusionmodules.util.global_checkpoint_flag = opt.grad_chkpt
 
         # UNetModel contains manual type conversion
         config.model.params.unet_config.params.use_fp16 = ("16" in opt.precision)

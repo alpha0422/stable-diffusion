@@ -18,6 +18,8 @@ from einops import repeat
 from ldm.util import instantiate_from_config
 
 
+global_checkpoint_flag = True
+
 def make_beta_schedule(schedule, n_timestep, linear_start=1e-4, linear_end=2e-2, cosine_s=8e-3):
     if schedule == "linear":
         betas = (
@@ -109,7 +111,8 @@ def checkpoint(func, inputs, params, flag):
                    explicitly take as arguments.
     :param flag: if False, disable gradient checkpointing.
     """
-    if flag:
+    global global_checkpoint_flag
+    if global_checkpoint_flag and flag:
         args = tuple(inputs) + tuple(params)
         return CheckpointFunction.apply(func, len(inputs), *args)
     else:
